@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kẻ Dẫn Đường Tâm Linh - Tarot Chatbot</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Mystical Stars & Fog Background -->
+  <div class="stars-bg"></div>
+  <div class="fog"></div>
+  <div class="mystic-orb orb-1"></div>
+  <div class="mystic-orb orb-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <svg class="mystic-eye" viewBox="0 0 100 100" width="60" height="60">
+          <circle cx="50" cy="50" r="45" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <path d="M15,50 Q50,15 85,50 Q50,85 15,50" fill="none" stroke="var(--gold)" stroke-width="2"/>
+          <circle cx="50" cy="50" r="15" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+          <circle cx="50" cy="50" r="6" fill="var(--gold)"/>
+          <path d="M50,5 L50,15 M50,85 L50,95 M5,50 L15,50 M85,50 L95,50" stroke="var(--gold)" stroke-width="1.5"/>
+        </svg>
+        <h1>KẺ DẪN ĐƯỜNG</h1>
+        <p class="subtitle">Trực Giác Sắc Bén • Vía Mạnh • Độc Bản</p>
+      </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="main-grid">
+      <!-- Left Panel: Chatbot Console -->
+      <section class="console-panel card">
+        <div class="panel-header">
+          <div class="reader-avatar">
+            <div class="avatar-glow"></div>
+            <svg viewBox="0 0 100 100" width="40" height="40" fill="var(--gold)">
+              <!-- Mystical Hooded Figure Icon -->
+              <path d="M50,15 C40,15 32,25 32,35 C32,45 38,50 38,55 C30,60 20,70 20,85 L80,85 C80,70 70,60 62,55 C62,50 68,45 68,35 C68,25 60,15 50,15 Z M50,22 C55,22 58,26 58,32 C58,36 56,40 53,42 C51,43 49,43 47,42 C44,40 42,36 42,32 C42,26 45,22 50,22 Z" />
+            </svg>
+          </div>
+          <div class="reader-info">
+            <h2>Kẻ Dẫn Đường Giữa Các Chiều Không Gian</h2>
+            <span class="status-badge"><span class="pulse-dot"></span>Đang Kết Nối Vũ Trụ</span>
+          </div>
+        </div>
+
+        <div class="console-body" id="consoleBody">
+          <!-- Welcome Message -->
+          <div class="message system-msg">
+            <div class="msg-content">
+              <p class="reader-intro">"Chào linh hồn đang tìm kiếm ánh sáng hoặc đối mặt với bóng tối. Ta là Kẻ Dẫn Đường. Ta không ở đây để an ủi ngươi bằng những lời dối trá ngọt ngào. Ta đọc vị tương lai và hiện tại dựa trên sự thật trần trụi của các lá bài."</p>
+              <p>Hãy chia sẻ với ta <strong>Câu hỏi</strong> ngươi khao khát có lời giải đáp và <strong>Hoàn cảnh thực tế</strong> của ngươi lúc này để vũ trụ định hình năng lượng.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-footer" id="initialFormContainer">
+          <div class="input-group">
+            <label for="question">Câu hỏi của ngươi là gì?</label>
+            <textarea id="question" placeholder="Ví dụ: Công việc sắp tới của tôi có tiến triển gì tốt không? Tôi có nên chuyển việc lúc này?" rows="2" required></textarea>
+          </div>
+          <div class="input-group">
+            <label for="situation">Hoàn cảnh thực tế lúc này của ngươi?</label>
+            <textarea id="situation" placeholder="Ví dụ: Tôi đang làm IT ở công ty cũ 3 năm, lương ổn nhưng áp lực lớn, sếp mới không hợp, đang có lời mời từ công ty khác nhưng lương thấp hơn một chút..." rows="3" required></textarea>
+          </div>
+          <button class="btn btn-glow" id="btnSubmitInitial">
+            <span>Xin Lời Khuyên & Sơ Đồ Trải Bài</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Panel: Card Selector & Layout Config (Hidden initially or inactive) -->
+      <section class="cards-panel card disabled" id="cardsPanel">
+        <div class="panel-header">
+          <h3>Bản Đồ Bài Trải Của Ngươi</h3>
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="btnPhysicalMode">Tự Nhập Bài Rút</button>
+            <button class="mode-btn" id="btnDigitalMode">Rút Bài Tự Động</button>
+          </div>
+        </div>
+
+        <div class="panel-body">
+          <!-- Setup Info Message -->
+          <div class="setup-hint">
+            <p>Vũ trụ khuyên ngươi hãy chuẩn bị số lượng lá bài phù hợp như Kẻ Dẫn Đường chỉ dẫn bên trái.</p>
+          </div>
+
+          <!-- Cards Layout Area -->
+          <div class="cards-layout" id="cardsLayout">
+            <!-- Will be dynamically populated with card slots -->
+            <div class="empty-layout-placeholder">
+              <svg viewBox="0 0 100 120" width="80" height="96" class="floating-card-icon">
+                <rect x="5" y="5" width="90" height="110" rx="8" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <circle cx="50" cy="60" r="15" fill="none" stroke="var(--gold)" stroke-width="1"/>
+                <path d="M50,30 L50,90 M30,60 L70,60" stroke="var(--gold)" stroke-width="1"/>
+              </svg>
+              <p>Hãy gửi câu hỏi trước để nhận đề xuất trải bài.</p>
+            </div>
+          </div>
+
+          <!-- Quick Selector (Dynamic Dropdown / Auto-complete) -->
+          <div class="card-selector-container hidden" id="cardSelectorContainer">
+            <div class="selector-controls">
+              <div class="search-box">
+                <input type="text" id="cardSearchInput" placeholder="Tìm kiếm lá bài (Tiếng Việt hoặc Tiếng Anh)..." autocomplete="off">
+                <div class="search-results hidden" id="searchResults"></div>
+              </div>
+              <div class="orientation-box">
+                <span class="label">Hướng lá bài:</span>
+                <div class="toggle-switch">
+                  <input type="checkbox" id="orientationToggle">
+                  <label for="orientationToggle">
+                    <span class="toggle-text upright">Xuôi (Upright)</span>
+                    <span class="toggle-text reversed">Ngược (Reversed)</span>
+                  </label>
+                </div>
+              </div>
+              <button class="btn btn-secondary" id="btnAddCardToSlot">Đặt Lá Bài Vào Vị Trí <span id="activeSlotName">1</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-footer hidden" id="cardsPanelFooter">
+          <button class="btn btn-glow w-full" id="btnDecodeSpread" disabled>
+            <span>Giải Mã Trải Bài Ngay Lập Tức</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m10 15 5-3-5-3v6z"/></svg>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2026 Kẻ Dẫn Đường. Khoa học giải mã năng lượng vũ trụ. Vía Mạnh - Đoán Định Trực Diện.</p>
+    </footer>
+  </div>
+
+  <!-- Modal for Gemini API Key config (if needed or warning if not set) -->
+  <div class="modal hidden" id="apiKeyModal">
+    <div class="modal-content card">
+      <h3>Cấu hình API Key</h3>
+      <p>Hệ thống yêu cầu cấu hình <code>GEMINI_API_KEY</code> trong tệp <code>.env</code> ở thư mục gốc của project để kết nối với vũ trụ.</p>
+      <p>Sau khi thiết lập xong, vui lòng khởi động lại server Node.js.</p>
+      <button class="btn" id="btnDismissModal">Đã Hiểu</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>
