@@ -151,17 +151,16 @@ function parseCardsFromText(text) {
 async function generateContentWithFallback(prompt, systemInstruction = SYSTEM_INSTRUCTION) {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       systemInstruction: systemInstruction
     });
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (err) {
-    console.warn("Gemini 3.5 Flash failed, falling back to 1.5-flash. Error:", err.message);
-    // If it's 503 Service Unavailable, 429 Rate Limit, or other temporary API error, retry with gemini-1.5-flash
+    console.warn("Gemini 3.1 Flash Lite failed, falling back to 3.5-flash. Error:", err.message);
     if (err.message.includes("503") || err.message.includes("high demand") || err.message.includes("429") || err.message.includes("Quota") || err.message.includes("ResourceExhausted")) {
       const fallbackModel = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash",
+        model: "gemini-3.5-flash",
         systemInstruction: systemInstruction
       });
       const result = await fallbackModel.generateContent(prompt);
