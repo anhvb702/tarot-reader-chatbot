@@ -152,7 +152,7 @@ async function generateTarotReading(question, situation, cards) {
   const prompt = `Querent hỏi: "${question}"\nHoàn cảnh của họ: "${situation}"\n\nCác lá bài rút được:\n${cardsList}\n\nHãy giải bài Tarot này thật sâu sắc theo phong thái vía mạnh, trực diện và không an ủi sáo rỗng. Hãy liên kết trực tiếp ý nghĩa xuôi/ngược của các lá bài vào hoàn cảnh của họ.`;
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash",
     systemInstruction: SYSTEM_INSTRUCTION
   });
 
@@ -279,7 +279,7 @@ bot.on('text', async (ctx) => {
     try {
       // Ask Gemini for recommended spread
       const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.5-flash",
         systemInstruction: SYSTEM_INSTRUCTION
       });
       const prompt = `Querent hỏi: "${session.question}"\nHoàn cảnh của họ: "${session.situation}"\n\nHãy phân tích sơ lược năng lượng vấn đề và đề xuất một SƠ ĐỒ TRẢ BÀI phù hợp (bao gồm số lá và vị trí cụ thể của từng lá). Sau đó hướng dẫn họ cách tĩnh tâm rút bài và cung cấp thông tin bài rút cho ta.`;
