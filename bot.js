@@ -147,17 +147,35 @@ function parseCardsFromText(text) {
 }
 
 // Call Gemini API to fetch reading
+// Helper to call Gemini with a fallback model if the primary is overloaded (503 / 429)
+async function generateContentWithFallback(prompt, systemInstruction = SYSTEM_INSTRUCTION) {
+  try {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-3.5-flash",
+      systemInstruction: systemInstruction
+    });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (err) {
+    console.warn("Gemini 3.5 Flash failed, falling back to 1.5-flash. Error:", err.message);
+    // If it's 503 Service Unavailable, 429 Rate Limit, or other temporary API error, retry with gemini-1.5-flash
+    if (err.message.includes("503") || err.message.includes("high demand") || err.message.includes("429") || err.message.includes("Quota") || err.message.includes("ResourceExhausted")) {
+      const fallbackModel = genAI.getGenerativeModel({
+        model: "gemini-1.5-flash",
+        systemInstruction: systemInstruction
+      });
+      const result = await fallbackModel.generateContent(prompt);
+      return result.response.text();
+    }
+    throw err;
+  }
+}
+
 async function generateTarotReading(question, situation, cards) {
   const cardsList = cards.map((c, i) => `- Lá số ${i+1} (${c.positionName || 'Vị trí ' + (i+1)}): ${c.nameVi} (${c.name}) - Hướng: ${c.orientation === 'reversed' ? 'NGƯỢC' : 'XUÔI'}`).join('\n');
   const prompt = `Querent hỏi: "${question}"\nHoàn cảnh của họ: "${situation}"\n\nCác lá bài rút được:\n${cardsList}\n\nHãy giải bài Tarot này thật sâu sắc theo phong thái vía mạnh, trực diện và không an ủi sáo rỗng. Hãy liên kết trực tiếp ý nghĩa xuôi/ngược của các lá bài vào hoàn cảnh của họ.`;
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-3.5-flash",
-    systemInstruction: SYSTEM_INSTRUCTION
-  });
-
-  const result = await model.generateContent(prompt);
-  return result.response.text();
+  return await generateContentWithFallback(prompt);
 }
 
 // Command: /start
@@ -278,14 +296,9 @@ bot.on('text', async (ctx) => {
 
     try {
       // Ask Gemini for recommended spread
-      const model = genAI.getGenerativeModel({
-        model: "gemini-3.5-flash",
-        systemInstruction: SYSTEM_INSTRUCTION
-      });
       const prompt = `Querent hỏi: "${session.question}"\nHoàn cảnh của họ: "${session.situation}"\n\nHãy phân tích sơ lược năng lượng vấn đề và đề xuất một SƠ ĐỒ TRẢ BÀI phù hợp (bao gồm số lá và vị trí cụ thể của từng lá). Sau đó hướng dẫn họ cách tĩnh tâm rút bài và cung cấp thông tin bài rút cho ta.`;
       
-      const result = await model.generateContent(prompt);
-      const recommendationText = result.response.text();
+      const recommendationText = await generateContentWithFallback(prompt);
       
       // Parse recommendation
       const { count, positions } = parseSpreadRecommendation(recommendationText);
