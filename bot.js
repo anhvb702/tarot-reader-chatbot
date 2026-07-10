@@ -146,6 +146,34 @@ function parseCardsFromText(text) {
   return { parsedCards, errors };
 }
 
+// Convert Markdown to Telegram HTML format
+function convertMarkdownToTelegramHtml(markdown) {
+  let html = markdown;
+
+  // Escape HTML characters to prevent parsing errors
+  html = html
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // Bold **text** -> <b>text</b>
+  html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+  // Italic *text* or _text_ -> <i>text</i>
+  html = html.replace(/\*(.*?)\*/g, '<i>$1</i>');
+  html = html.replace(/_(.*?)_/g, '<i>$1</i>');
+
+  // Headers: ###, ##, # -> Bold
+  html = html.replace(/^###\s+(.*?)$/gm, '<b>$1</b>');
+  html = html.replace(/^##\s+(.*?)$/gm, '<b>$1</b>');
+  html = html.replace(/^#\s+(.*?)$/gm, '<b>$1</b>');
+
+  // Bullet items
+  html = html.replace(/^\s*[\*\-]\s+(.*?)$/gm, '• $1');
+
+  return html;
+}
+
 // Call Gemini API to fetch reading
 // Helper to call Gemini with a fallback model if the primary is overloaded (503 / 429)
 async function generateContentWithFallback(prompt, systemInstruction = SYSTEM_INSTRUCTION) {
@@ -182,11 +210,11 @@ bot.start((ctx) => {
   const session = initSession(ctx);
   session.step = 'IDLE';
   
-  ctx.replyWithMarkdown(
-    `🔮 *KẺ DẪN ĐƯỜNG GIỮA CÁC CHIỀU KHÔNG GIAN* 🔮\n\n` +
+  ctx.replyWithHTML(
+    `🔮 <b>KẺ DẪN ĐƯỜNG GIỮA CÁC CHIỀU KHÔNG GIAN</b> 🔮\n\n` +
     `"Chào linh hồn đang tìm kiếm ánh sáng hoặc đối mặt với bóng tối. Ta là Kẻ Dẫn Đường.\n` +
     `Ta không ở đây để an ủi ngươi bằng những lời dối trá ngọt ngào. Ta đọc vị tương lai và hiện tại dựa trên sự thật trần trụi của các lá bài."\n\n` +
-    `👉 Hãy gõ lệnh \`/tarot\` để bắt đầu một phiên giải bài Tarot mới.`
+    `👉 Hãy gõ lệnh <code>/tarot</code> để bắt đầu một phiên giải bài Tarot mới.`
   );
 });
 
@@ -235,12 +263,12 @@ bot.on('callback_query', async (ctx) => {
     session.slots = drawn;
     
     // Report drawn cards
-    let cardReport = `✨ *Các lá bài đã rút được:* \n`;
+    let cardReport = `✨ <b>Các lá bài đã rút được:</b> \n`;
     drawn.forEach((c, idx) => {
-      cardReport += `*Lá số ${idx+1} (${c.positionName}):* ${c.nameVi} (${c.name}) - Hướng: *${c.orientation === 'upright' ? 'XUÔI' : 'NGƯỢC'}*\n`;
+      cardReport += `<b>Lá số ${idx+1} (${c.positionName}):</b> ${c.nameVi} (${c.name}) - Hướng: <b>${c.orientation === 'upright' ? 'XUÔI' : 'NGƯỢC'}</b>\n`;
     });
     
-    await ctx.replyWithMarkdown(cardReport);
+    await ctx.replyWithHTML(cardReport);
 
     // Proceed to reading
     const statusMsg = await ctx.reply("⚡ Kẻ Dẫn Đường đang kết nối năng lượng tâm linh và giải mã quẻ bài...");
@@ -252,8 +280,8 @@ bot.on('callback_query', async (ctx) => {
         ctx.chat.id,
         statusMsg.message_id,
         null,
-        reading,
-        { parse_mode: 'Markdown' }
+        convertMarkdownToTelegramHtml(reading),
+        { parse_mode: 'HTML' }
       );
     } catch (err) {
       console.error(err);
@@ -266,13 +294,13 @@ bot.on('callback_query', async (ctx) => {
     // Physical Card Input
     session.step = 'AWAITING_CARDS';
     
-    let instructions = `✍️ *Hãy nhập danh sách các lá bài ngươi tự rút được.*\n\n` +
-      `Nhập tên các lá bài theo thứ tự, cách nhau bằng dấu phẩy và kèm theo hướng *xuôi* hoặc *ngược* cho từng lá.\n\n` +
-      `*Ví dụ định dạng (với ${session.recommendedCount} lá):*\n` +
-      `\`Chàng Khờ xuôi, Cái Chết ngược, Mặt Trời xuôi\`\n\n` +
+    let instructions = `✍️ <b>Hãy nhập danh sách các lá bài ngươi tự rút được.</b>\n\n` +
+      `Nhập tên các lá bài theo thứ tự, cách nhau bằng dấu phẩy và kèm theo hướng <i>xuôi</i> hoặc <i>ngược</i> cho từng lá.\n\n` +
+      `<b>Ví dụ định dạng (với ${session.recommendedCount} lá):</b>\n` +
+      `<code>Chàng Khờ xuôi, Cái Chết ngược, Mặt Trời xuôi</code>\n\n` +
       `Hãy nhập và gửi tin nhắn cho ta ngay sau đây.`;
       
-    await ctx.replyWithMarkdown(instructions);
+    await ctx.replyWithHTML(instructions);
   }
 });
 
@@ -309,8 +337,8 @@ bot.on('text', async (ctx) => {
         ctx.chat.id,
         waitMsg.message_id,
         null,
-        recommendationText,
-        { parse_mode: 'Markdown' }
+        convertMarkdownToTelegramHtml(recommendationText),
+        { parse_mode: 'HTML' }
       );
 
       // Present keyboard options
@@ -339,8 +367,8 @@ bot.on('text', async (ctx) => {
     const { parsedCards, errors } = parseCardsFromText(text);
 
     if (errors.length > 0) {
-      let errMsg = `❌ *Có lỗi khi nhận diện bài của ngươi:*\n` + errors.map(e => `- ${e}`).join('\n') + `\n\nHãy kiểm tra lại tên lá bài (ví dụ: Chàng Khờ, Nhà Ảo Thuật, Hiệp sĩ Kiếm, Ace of Cups...) và gửi lại đúng định dạng.`;
-      await ctx.replyWithMarkdown(errMsg);
+      let errMsg = `❌ <b>Có lỗi khi nhận diện bài của ngươi:</b>\n` + errors.map(e => `- ${e}`).join('\n') + `\n\nHãy kiểm tra lại tên lá bài (ví dụ: Chàng Khờ, Nhà Ảo Thuật, Hiệp sĩ Kiếm, Ace of Cups...) và gửi lại đúng định dạng.`;
+      await ctx.replyWithHTML(errMsg);
       return;
     }
 
@@ -357,12 +385,12 @@ bot.on('text', async (ctx) => {
     session.slots = parsedCards;
 
     // Report cards
-    let cardReport = `✨ *Ghi nhận các lá bài của ngươi:* \n`;
+    let cardReport = `✨ <b>Ghi nhận các lá bài của ngươi:</b> \n`;
     parsedCards.forEach((c, idx) => {
-      cardReport += `*Lá số ${idx+1} (${c.positionName}):* ${c.nameVi} (${c.name}) - Hướng: *${c.orientation === 'upright' ? 'XUÔI' : 'NGƯỢC'}*\n`;
+      cardReport += `<b>Lá số ${idx+1} (${c.positionName}):</b> ${c.nameVi} (${c.name}) - Hướng: <b>${c.orientation === 'upright' ? 'XUÔI' : 'NGƯỢC'}</b>\n`;
     });
     
-    await ctx.replyWithMarkdown(cardReport);
+    await ctx.replyWithHTML(cardReport);
 
     // Proceed to reading
     const statusMsg = await ctx.reply("⚡ Kẻ Dẫn Đường đang kết nối năng lượng tâm linh và giải mã quẻ bài...");
@@ -374,8 +402,8 @@ bot.on('text', async (ctx) => {
         ctx.chat.id,
         statusMsg.message_id,
         null,
-        reading,
-        { parse_mode: 'Markdown' }
+        convertMarkdownToTelegramHtml(reading),
+        { parse_mode: 'HTML' }
       );
     } catch (err) {
       console.error(err);
