@@ -1,61 +1,49 @@
-# Tarot Reader Chatbot - Kẻ Dẫn Đường Tâm Linh
+# Tarot Reader Telegram Bot - Kẻ Dẫn Đường Tâm Linh
 
-Chào mừng bạn đến với **Tarot Reader Chatbot (Kẻ Dẫn Đường)**, một ứng dụng trò chuyện và giải mã các thông điệp Tarot dựa trên trí tuệ nhân tạo (API Gemini 2.5 Flash). Ứng dụng được thiết kế theo phong cách huyền bí, tinh tế và tập trung vào trải nghiệm trực quan của người dùng.
+Chào mừng bạn đến với **Tarot Reader Telegram Bot (Kẻ Dẫn Đường)**, một bot Telegram trò chuyện và giải mã các thông điệp Tarot dựa trên trí tuệ nhân tạo (API Gemini 2.5 Flash). Bot được cấu hình với giọng điệu thần bí, thấu suốt thực tế câu hỏi và hoàn cảnh của người trải, **không xoa dịu/an ủi sáo rỗng**, đi thẳng vào bản chất vấn đề và bài học tâm linh cần đối mặt.
 
 ## Tính Năng Nổi Bật
 
-- **Giao diện huyền bí (Mystical Glassmorphic UI):** Tông màu chủ đạo là tím đậm, xanh không gian kết hợp viền vàng ánh kim và hiệu ứng ánh sáng, lật bài mượt mà.
-- **Tarot Reader "Vía Mạnh":** Trả lời trực diện, thấu suốt thực tế câu hỏi và hoàn cảnh của người trải, **không xoa dịu/an ủi sáo rỗng**, đi thẳng vào bản chất vấn đề và bài học tâm linh cần đối mặt.
-- **Sơ đồ trải bài linh hoạt:** Đề xuất số lượng lá bài và sơ đồ trải bài phù hợp nhất dựa trên Câu hỏi & Hoàn cảnh của bạn.
-- **Tương tác linh hoạt (2 Chế độ):**
-  - *Tự Nhập Bài Rút (Physical Mode):* Cho phép bạn xào bài vật lý của riêng mình, rút bài và nhập từng lá bài đã rút (kèm hướng Xuôi/Ngược) vào hệ thống thông qua bộ lọc thông minh (search autocomplete) của 78 lá bài.
-  - *Rút Bài Tự Động (Digital Mode):* Hệ thống sẽ tự động xào và rút bài ngẫu nhiên (không trùng lặp) và đặt vào các vị trí sơ đồ tương ứng.
-- **Hiệu ứng Streaming (Server-Sent Events):** Kết quả giải bài được truyền tải từ API dưới dạng streaming thời gian thực, mang lại cảm giác sống động như người giải bài đang trực tiếp gõ chữ.
+- **Tarot Reader "Vía Mạnh":** Trực diện, sắc sảo và uy nghiêm. Chỉ thẳng lỗi sai, trở ngại và điểm nghẽn nghiệp quả của người hỏi mà không xoa dịu bằng lời nói ngọt ngào sáo rỗng.
+- **Sơ đồ trải bài linh hoạt:** Dựa vào câu hỏi, bot sẽ phân tích năng lượng vấn đề và đề xuất sơ đồ trải bài phù hợp nhất (1 lá, 3 lá Quá khứ - Hiện tại - Tương lai, v.v.).
+- **2 Chế độ Rút Bài:**
+  - *Rút bài tự động (Digital Mode):* Bot sẽ tự xáo bài và rút ngẫu nhiên các lá bài không trùng lặp từ kho dữ liệu 78 lá, gán hướng Xuôi/Ngược và giải bài lập tức.
+  - *Tự nhập bài vật lý (Physical Mode):* Cho phép bạn nhập danh sách bài đã rút từ bài vật lý của riêng bạn dưới dạng văn bản đơn giản (ví dụ: `Fool xuôi, Death ngược, Sun xuôi`). Bot có bộ lọc thông minh (Fuzzy logic) tự động nhận diện chính xác 78 lá bài kể cả viết tắt hay tiếng Anh.
+- **Trạng thái Gõ Chữ (Typing status):** Giúp cuộc trò chuyện tự nhiên hơn trong thời gian bot chờ kết nối API Gemini.
 
 ## Công Nghệ Sử Dụng
 
-- **Backend:** Node.js, Express, `@google/generative-ai` (Gemini SDK), `dotenv`, `cors`
-- **Frontend:** Vanilla HTML5, CSS3 (Custom transitions, gradients, keyframe animations), ES6 Modules JavaScript
+- **Backend:** Node.js, `telegraf` (Telegram Bot SDK), `@google/generative-ai` (Gemini SDK), `dotenv`
 - **Mô hình AI:** `gemini-2.5-flash`
 
 ## Hướng Dẫn Cài Đặt và Chạy
 
 ### 1. Chuẩn Bị
-Yêu cầu hệ thống đã cài đặt sẵn **Node.js** (Khuyên dùng phiên bản 18+).
+- Máy tính đã cài đặt **Node.js** (Phiên bản 18+).
+- Một **Telegram Bot Token** được tạo từ BotFather trên Telegram (gõ chat với [@BotFather](https://t.me/BotFather) để tạo bot mới và nhận token).
+- Một **Gemini API Key** tạo miễn phí tại [Google AI Studio](https://aistudio.google.com/).
 
 ### 2. Cài đặt Dependencies
-Mở terminal tại thư mục dự án và chạy lệnh:
+Mở terminal tại thư mục dự án và chạy:
 ```bash
 npm install
 ```
 
 ### 3. Cấu hình Environment
-Tạo tệp `.env` tại thư mục gốc (hoặc sao chép từ `.env.example`) và điền API Key Gemini của bạn:
+Tạo tệp `.env` tại thư mục gốc (hoặc sao chép từ `.env.example`) và điền các API Key & Token của bạn:
 ```env
 PORT=3000
 GEMINI_API_KEY=your_actual_gemini_api_key_here
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
 ```
-*(Nếu chưa có API Key, bạn có thể tạo miễn phí tại [Google AI Studio](https://aistudio.google.com/))*
 
-### 4. Khởi động Ứng dụng
-Khởi chạy server Node.js:
+### 4. Khởi động Bot Telegram
+Khởi chạy bot:
 ```bash
 npm start
 ```
-Truy cập vào ứng dụng qua trình duyệt web tại địa chỉ: [http://localhost:3000](http://localhost:3000)
+Mở Telegram, tìm kiếm username của Bot bạn đã tạo và gõ `/start` hoặc `/tarot` để bắt đầu cuộc trò chuyện giải bài Tarot.
 
-## Cấu Trúc Thư Mục
-```
-tarot-reader-chatbot/
-├── public/                 # Thư mục chứa tài nguyên tĩnh
-│   ├── app.js              # Mã nguồn xử lý logic frontend & API
-│   ├── index.html          # Giao diện chính của ứng dụng
-│   ├── style.css           # Định nghĩa giao diện & hiệu ứng CSS
-│   └── tarot-data.js       # Dữ liệu thuộc tính của 78 lá bài Tarot
-├── .env                    # File cấu hình môi trường chứa API Key (được bỏ qua bởi git)
-├── .env.example            # Bản mẫu cấu hình môi trường
-├── .gitignore              # Định nghĩa các tệp bỏ qua khi push git
-├── package.json            # Quản lý thư viện cài đặt & scripts chạy dự án
-├── README.md               # Hướng dẫn dự án này
-└── server.js               # Máy chủ Backend Node.js kết nối API Gemini
-```
+---
+
+*Lưu ý: Dự án vẫn giữ lại mã nguồn của máy chủ Web app ở tệp `server.js` và thư mục `public/`. Nếu muốn chạy giao diện Web, bạn có thể chạy lệnh `npm run web` và truy cập `http://localhost:3000`.*
